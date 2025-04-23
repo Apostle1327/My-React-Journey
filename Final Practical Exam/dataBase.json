@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "895c",
+      "name": "Dakota Hensley",
+      "email": "sofupukedy@mailinator.com",
+      "phone": "+1 (576) 857-677",
+      "image": "https://www.piqisuvyn.com.jpg",
+      "status": true
+    },
+    {
+      "id": "efbf",
+      "name": "Evelyn Mclean",
+      "email": "napasev@mailinator.com",
+      "phone": "+1 (994) 652-97",
+      "image": "https://www.vonamaj.org.au",
+      "status": true
+    },
+    {
+      "id": "1c31",
+      "name": "Carson Suarez",
+      "email": "kuzoge@mailinator.com",
+      "phone": "+1 (374) 359-8255",
+      "image": "https://www.wufo.org.uk",
+      "status": true
+    }
+  ]
+}
