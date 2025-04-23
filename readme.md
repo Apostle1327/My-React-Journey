@@ -33,4 +33,4 @@ Here are some incredible resources that have been instrumental in shaping my lea
 
 - [FreeCodeCamp](https://www.freecodecamp.org/learn/full-stack-developer/) 🌐: For those days when I need a guided challenge.
 
-- [Mistakes] 🃏: Yep, still my best teacher. I’m not a robot, and I don’t want to be one either. Mistakes? Bring ’em on. That’s how I grow.
+- Mistakes 🃏: Yep, still my best teacher. I’m not a robot, and I don’t want to be one either. Mistakes? Bring ’em on. That’s how I grow.
