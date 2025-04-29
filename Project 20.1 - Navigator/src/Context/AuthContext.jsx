@@ -1,112 +1,119 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-const hashPassword = async (
+const AuthContext = createContext();
+
+const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+const PHONE_REGEX = /^(?=(?:.*\d){10}$)\+?[0-9\s\-()]+$/;
+
+function validateSignUpData({
+  firstName,
+  lastName,
+  userName,
+  email,
+  dob,
+  phone,
+  hobby,
+  gender,
+  address,
+  city,
   password,
-  salt = crypto.getRandomValues(new Uint8Array(16))
-) => {
-  const encoder = new TextEncoder();
-  const passwordData = encoder.encode(password);
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    passwordData,
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"]
-  );
+  confirmPassword,
+}) {
+  const errors = {};
 
-  const derivedKey = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    256
-  );
+  if (!firstName?.trim()) errors.firstName = "First name is required";
+  if (!lastName?.trim()) errors.lastName = "Last name is required";
+  if (!userName?.trim()) errors.userName = "Username is required";
 
-  return {
-    salt: Array.from(salt),
-    hash: Array.from(new Uint8Array(derivedKey)),
-  };
-};
+  if (!email?.trim()) errors.email = "Email is required";
+  else if (!EMAIL_REGEX.test(email)) errors.email = "Email format is invalid";
 
-const verifyPassword = async (password, saltArray, storedHashArray) => {
-  const salt = new Uint8Array(saltArray);
-  const storedHash = new Uint8Array(storedHashArray);
+  if (!dob) errors.dob = "Date of birth is required";
 
-  const { hash } = await hashPassword(password, salt);
-  return storedHash.every((byte, i) => byte === hash[i]);
-};
+  if (!phone?.trim()) errors.phone = "Phone is required";
+  else if (!PHONE_REGEX.test(phone))
+    errors.phone = "Enter a valid 10‐digit phone number";
 
-// Context and Provider
-const AuthContext = createContext(null);
+  if (!Array.isArray(hobby) || hobby.length === 0)
+    errors.hobby = "Select at least one hobby";
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  if (!gender) errors.gender = "Gender is required";
+  if (!address?.trim()) errors.address = "Address is required";
+  if (!city?.trim()) errors.city = "City is required";
 
-  const [users, setUsers] = useState(() => {
-    const savedUsers = localStorage.getItem("users");
-    return savedUsers ? JSON.parse(savedUsers) : [];
-  });
+  if (!password) errors.password = "Password is required";
+  else if (!PASSWORD_REGEX.test(password))
+    errors.password =
+      "Password must have at least 8 characters, including upper, lower, digit, and special character";
 
-  const register = async (email, password) => {
-    if (!email.match(/^\S+@\S+\.\S+$/)) {
-      throw new Error("Invalid email format");
+  if (!confirmPassword) errors.confirmPassword = "Confirm your password";
+  else if (password !== confirmPassword)
+    errors.confirmPassword = "Passwords must match";
+
+  return errors;
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+
+  // load persisted user on mount
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("currentUser"));
+    if (saved) setUser(saved);
+  }, []);
+
+  const register = async (signUpData) => {
+    const errors = validateSignUpData(signUpData);
+    if (Object.keys(errors).length > 0) {
+      const e = new Error("Validation failed");
+      e.fieldErrors = errors;
+      throw e;
     }
 
-    if (password.length < 8) {
-      throw new Error("Password must be at least 8 characters");
-    }
+    const { email, password, userName, ...rest } = signUpData;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const userExists = users.find((u) => u.email === email);
-    if (userExists) {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    if (users.some((u) => u.email === normalizedEmail)) {
       throw new Error("User already exists");
     }
+    if (
+      users.some(
+        (u) => u.userName.toLowerCase() === userName.trim().toLowerCase()
+      )
+    ) {
+      throw new Error("Username already taken");
+    }
 
-    const { hash, salt } = await hashPassword(password);
     const newUser = {
-      id: Date.now(),
-      email,
-      passwordHash: hash,
-      salt,
+      email: normalizedEmail,
+      password,
+      userName: userName.trim(),
+      ...rest,
     };
-
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    const userWithoutPassword = { id: newUser.id, email: newUser.email };
-    setUser(userWithoutPassword);
-    localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+    const updatedList = [...users, newUser];
+    localStorage.setItem("users", JSON.stringify(updatedList));
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+    setUser(newUser);
   };
 
   const login = async (email, password) => {
-    const user = users.find((u) => u.email === email);
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
-
-    const isPasswordValid = await verifyPassword(
-      password,
-      user.salt,
-      user.passwordHash
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = users.find(
+      (u) => u.email === normalizedEmail && u.password === password
     );
-    if (!isPasswordValid) {
+    if (!existingUser) {
       throw new Error("Invalid credentials");
     }
-
-    const userWithoutPassword = { id: user.id, email: user.email };
-    setUser(userWithoutPassword);
-    localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+    setUser(existingUser);
+    localStorage.setItem("currentUser", JSON.stringify(existingUser));
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
-    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
   };
 
   return (
@@ -114,12 +121,6 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
