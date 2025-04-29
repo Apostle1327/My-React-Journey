@@ -60,13 +60,13 @@ Only accessible after login; displays a welcome message and a logout button.
 1. **Clone the Repository:**
 
 ```bash
-
+https://github.com/Apostle1327/My-React-Journey/tree/master/Project%2020.1%20-%20Navigator
 ```
 
 2. **Navigate to the Project Directory:**
 
 ```bash
-cd
+cd Project 20.1 - Navigator
 ```
 
 3. **Install Dependencies:**
@@ -102,7 +102,14 @@ cd
 
 # 📷 Screenshots
 
-<img width="330" alt="Navigator - 1" src="./src/Images/">
+<img width="330" alt="Navigator - 1" src="./src/Images/Navigator - 01.png">
+<img width="330" alt="Navigator - 2" src="./src/Images/Navigator - 02.png">
+<img width="330" alt="Navigator - 3" src="./src/Images/Navigator - 03.png">
+<img width="330" alt="Navigator - 4" src="./src/Images/Navigator - 04.png">
+<img width="330" alt="Navigator - 5" src="./src/Images/Navigator - 05.png">
+<img width="330" alt="Navigator - 6" src="./src/Images/Navigator - 06.png">
+<img width="330" alt="Navigator - 7" src="./src/Images/Navigator - 07.png">
+<img width="330" alt="Navigator - 8" src="./src/Images/Navigator - 08.png">
 
 ## 🛠️ Technologies Used
 

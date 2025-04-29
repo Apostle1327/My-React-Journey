@@ -173,44 +173,47 @@ const SignUp = () => {
               {fieldErrors.phone}
             </Form.Control.Feedback>
           </FloatingLabel>
+          <div className="d-flex justify-content-between">
+            <Form.Group className="mb-3">
+              <Form.Label>Select your hobbies:</Form.Label>
+              {["Coding", "Reading", "Music"].map((h) => (
+                <Form.Check
+                  key={h}
+                  type="checkbox"
+                  label={h}
+                  name="hobby"
+                  value={h}
+                  checked={hobby.includes(h)}
+                  onChange={handleChange}
+                />
+              ))}
+              {fieldErrors.hobby && (
+                <Form.Text className="text-danger">
+                  {fieldErrors.hobby}
+                </Form.Text>
+              )}
+            </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Select your hobbies:</Form.Label>
-            {["Coding", "Reading", "Music"].map((h) => (
-              <Form.Check
-                key={h}
-                type="checkbox"
-                label={h}
-                name="hobby"
-                value={h}
-                checked={hobby.includes(h)}
-                onChange={handleChange}
-              />
-            ))}
-            {fieldErrors.hobby && (
-              <Form.Text className="text-danger">{fieldErrors.hobby}</Form.Text>
-            )}
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Select your gender:</Form.Label>
-            {["Male", "Female"].map((g) => (
-              <Form.Check
-                key={g}
-                type="radio"
-                label={g}
-                name="gender"
-                value={g}
-                checked={gender === g}
-                onChange={handleChange}
-              />
-            ))}
-            {fieldErrors.gender && (
-              <Form.Text className="text-danger">
-                {fieldErrors.gender}
-              </Form.Text>
-            )}
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Select your gender:</Form.Label>
+              {["Male", "Female"].map((g) => (
+                <Form.Check
+                  key={g}
+                  type="radio"
+                  label={g}
+                  name="gender"
+                  value={g}
+                  checked={gender === g}
+                  onChange={handleChange}
+                />
+              ))}
+              {fieldErrors.gender && (
+                <Form.Text className="text-danger">
+                  {fieldErrors.gender}
+                </Form.Text>
+              )}
+            </Form.Group>
+          </div>
 
           <FloatingLabel controlId="address" label="Address" className="mb-3">
             <Form.Control
